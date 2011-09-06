@@ -33,10 +33,9 @@ public class CredentialAutoUnlockActivity extends Activity {
 
         Notification notification = new Notification(R.drawable.icon, "Unlocking Credential Storage", System.currentTimeMillis());
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(), 0);
-        
+
         InfoText = (TextView) findViewById(R.id.InfoText);
-        InfoText.setText("Unlocking keystore. Please wait");
+        InfoText.setText("Unlocking keystore. Please enter key");
         
         KeyStore store = new KeyStore(this);
         store.unlock(this);
@@ -44,15 +43,22 @@ public class CredentialAutoUnlockActivity extends Activity {
         boolean isUnlocked = store.isUnlocked();
         String unlockText = "Keystore state is: " + ( isUnlocked ? "Unlocked" : "Locked");
         InfoText.setText(unlockText);
-        Toast.makeText(this, unlockText , 2000).show();
 
-        notification.setLatestEventInfo(getApplicationContext(), "Credential Storage Status", unlockText, contentIntent);
-        mNotificationManager.notify(HELLO_ID, notification);
+        Intent notificationIntent;
+        if ( isUnlocked )
+        {
+        	notificationIntent = new Intent();
+        } else {
+        	notificationIntent = new Intent(this, CredentialAutoUnlockActivity.class);
+        	
+        	String notificationText = "Keystore is locked. Press to unlock";
+            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+            notification.setLatestEventInfo(getApplicationContext(), "Credential Storage Status", notificationText, contentIntent);
+            mNotificationManager.notify(HELLO_ID, notification);
+        }
         
-		if ( isUnlocked )
-		{
-			finish();
-		}
+        Toast.makeText(this, unlockText , 4000).show();
+		finish();
     }
 }
 
