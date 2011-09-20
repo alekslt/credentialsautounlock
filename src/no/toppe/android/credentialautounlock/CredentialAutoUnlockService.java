@@ -30,20 +30,21 @@ public class CredentialAutoUnlockService extends Service {
 	/**
 	 * Delay until first execution of the Log task.
 	 */
-	private final long mDelay = 0;
+	private final long mDelay = 2000;
 	/**
 	 * Period of the Log task.
 	 */
-	private final long mPeriod = 2000;
+	private final long mPeriod = 5000;
 
 	/**
 	 * Timer to schedule the service.
 	 */
 	private Timer mTimer;
-
+	
 	/**
-	 * Implementation of the timer task.
+	 * State variable to stop spamming the user with unlock requests.
 	 */
+	public boolean shouldUnlock = true;
 	
 	protected boolean unlock()
 	{		
@@ -54,26 +55,31 @@ public class CredentialAutoUnlockService extends Service {
 		
 		if ( !isUnlocked )
 		{
-			Notification notification = new Notification(R.drawable.icon,
-					"Unlocking Credential Storage", System.currentTimeMillis());
-			notification.flags |= Notification.FLAG_AUTO_CANCEL;
-			
-			store.unlock(this);
-			
-			isUnlocked = store.isUnlocked();
-			
-			Intent notificationIntent = new Intent(this,
-						CredentialAutoUnlockService.class);
-	
-			String notificationText = "Keystore is locked. Press to unlock";
-			PendingIntent contentIntent = PendingIntent.getService(this, 0,
-					notificationIntent, 0);
-			notification.setLatestEventInfo(getApplicationContext(),
-					"Credential Storage Status", notificationText,
-					contentIntent);
-			mNotificationManager.notify(HELLO_ID, notification);
-	
-			//Toast.makeText(this, unlockText, 4000).show();
+			if ( shouldUnlock )
+			{
+				Notification notification = new Notification(R.drawable.icon,
+						"Unlocking Credential Storage", System.currentTimeMillis());
+				notification.flags |= Notification.FLAG_AUTO_CANCEL;
+				
+				shouldUnlock = false;
+				
+				store.unlock(this);
+				
+				isUnlocked = store.isUnlocked();
+				
+				Intent notificationIntent = new Intent(this,
+							CredentialStorageUnlockActivity.class);
+		
+				String notificationText = "Keystore is locked. Press to unlock";
+				PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+						notificationIntent, 0);
+				notification.setLatestEventInfo(getApplicationContext(),
+						"Credential Storage Status", notificationText,
+						contentIntent);
+				mNotificationManager.notify(HELLO_ID, notification);
+		
+				//Toast.makeText(this, unlockText, 4000).show();
+			}
 		} else {
 			mNotificationManager.cancel(HELLO_ID);
 			mTimer.cancel();
@@ -84,6 +90,9 @@ public class CredentialAutoUnlockService extends Service {
 		return isUnlocked;
 	}
 	
+	/**
+	 * Implementation of the timer task.
+	 */
 	private class LogTask extends TimerTask {
 		public void run() {
 			unlock();
@@ -168,7 +177,7 @@ class KeyStore extends AbstractWrapper {
 
 	public boolean isUnlocked() {
 		int err = this.<Integer> invokeStubMethod("test");
-		Log.d(TAG, "KeyStore.test result is: " + err);
+		//Log.d(TAG, "KeyStore.test result is: " + err);
 		return err == NO_ERROR;
 	}
 }

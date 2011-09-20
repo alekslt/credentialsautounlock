@@ -3,6 +3,7 @@ package no.toppe.android.credentialautounlock;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 public class CredentialStorageUnlockActivity extends Activity {
@@ -15,6 +16,7 @@ public class CredentialStorageUnlockActivity extends Activity {
 		store = new KeyStore(this);
 		boolean isUnlocked = store.isUnlocked();
 		
+		Log.d("CredUnlockActivity", "Trying to unlock keystore - stopping service first");
 		stopService(new Intent(this, CredentialAutoUnlockService.class));
 		
 		if ( isUnlocked )
