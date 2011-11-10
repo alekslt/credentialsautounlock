@@ -21,7 +21,7 @@ public class CredentialStorageUnlockActivity extends Activity {
 		
 		if ( isUnlocked )
 		{
-			Toast.makeText(this, "Credentials Storage is already unlocked", 4000).show();
+			Toast.makeText(this, R.string.keystore_already_unlocked, 4000).show();
 		} else {
 			startService(new Intent(this, CredentialAutoUnlockService.class));
 		}

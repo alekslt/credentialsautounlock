@@ -49,16 +49,16 @@ public class CredentialAutoUnlockService extends Service {
 	protected boolean unlock()
 	{		
 		boolean isUnlocked = store.isUnlocked();
-		String unlockText = "Keystore state is: "
-			+ (isUnlocked ? "Unlocked" : "Locked");
-		Log.d(LOGTAG, "Periodic Check. " + unlockText);
+		
+		//String unlockText = "Keystore state is: " + (isUnlocked ? "Unlocked" : "Locked");
+		//Log.d(LOGTAG, "Periodic Check. " + unlockText);
 		
 		if ( !isUnlocked )
 		{
 			if ( shouldUnlock )
 			{
-				Notification notification = new Notification(R.drawable.icon,
-						"Unlocking Credential Storage", System.currentTimeMillis());
+				Notification notification = new Notification(R.drawable.ic_launcher,
+						getText(R.string.keystore_unlocking), System.currentTimeMillis());
 				notification.flags |= Notification.FLAG_AUTO_CANCEL;
 				
 				shouldUnlock = false;
@@ -70,11 +70,10 @@ public class CredentialAutoUnlockService extends Service {
 				Intent notificationIntent = new Intent(this,
 							CredentialStorageUnlockActivity.class);
 		
-				String notificationText = "Keystore is locked. Press to unlock";
 				PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
 						notificationIntent, 0);
 				notification.setLatestEventInfo(getApplicationContext(),
-						"Credential Storage Status", notificationText,
+						getText(R.string.notification_keystore_status), getText(R.string.notification_keystore_is_locked),
 						contentIntent);
 				mNotificationManager.notify(HELLO_ID, notification);
 		
@@ -90,9 +89,6 @@ public class CredentialAutoUnlockService extends Service {
 		return isUnlocked;
 	}
 	
-	/**
-	 * Implementation of the timer task.
-	 */
 	private class LogTask extends TimerTask {
 		public void run() {
 			unlock();
@@ -130,7 +126,7 @@ public class CredentialAutoUnlockService extends Service {
 
 class KeyStore extends AbstractWrapper {
 
-	public String TAG = "CredUnlock";
+	public String TAG = "CredentialAutoUnlock";
 	public static final String UNLOCK_ACTION = "android.credentials.UNLOCK";
 	private static final int NO_ERROR = 1;
 

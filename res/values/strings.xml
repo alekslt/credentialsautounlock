@@ -2,4 +2,9 @@
 <resources>
     <string name="hello">Hello World, CredentialAutoUnlockActivity!</string>
     <string name="app_name">Unlock Keystore</string>
+    <string name="keystore_already_unlocked">Credentials Storage is already unlocked</string>
+    <string name="keystore_is_locked">Keystore is locked</string>
+    <string name="notification_keystore_is_locked">Keystore is locked. Press to unlock</string>
+    <string name="notification_keystore_status">Credential Storage Status</string>
+    <string name="keystore_unlocking">Unlocking Credential Storage</string>
 </resources>
